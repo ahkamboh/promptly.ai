@@ -1,95 +1,196 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+
+
+'use client'
+
+import { Box, Button, Stack, TextField, Typography, Avatar } from '@mui/material';
+import { useState, useRef, useEffect } from 'react';
+import PersonIcon from '@mui/icons-material/Person';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 
 export default function Home() {
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content: "Hi! I'm the Headstarter support assistant. How can I help you today?",
+    },
+  ]);
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const sendMessage = async () => {
+    if (!message.trim()) return;  // Don't send empty messages
+  
+    setMessage('');
+    setMessages((messages) => [
+      ...messages,
+      { role: 'user', content: message },
+      { role: 'assistant', content: '' },
+    ]);
+  
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message }), // Send only the message in the body
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok: ' + response.statusText);
+      }
+  
+      const responseData = await response.json();
+      const assistantMessage = responseData.message; // Extract the message content
+  
+      setMessages((messages) => {
+        const lastMessage = messages[messages.length - 1];
+        const otherMessages = messages.slice(0, messages.length - 1);
+        return [
+          ...otherMessages,
+          { ...lastMessage, content: assistantMessage }, // Set the plain text content
+        ];
+      });
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
+      setMessages((messages) => [
+        ...messages,
+        { role: 'assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      minHeight="100vh"
+      sx={{ backgroundColor: '#f0f0f0', position: 'relative', paddingTop: '100px' }}
+    >
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          position: 'absolute', 
+          top: 0, 
+          width: '100%', 
+          textAlign: 'center', 
+          padding: '20px 0', 
+          backgroundColor: '#fff', 
+          boxShadow: '0px 2px 4px rgba(0,0,0,0.1)' 
+        }}
+      >
+        HeadStarter User Support Chatbot
+      </Typography>
+      <Box
+        sx={{
+          width: '500px',
+          maxHeight: '80vh',
+          bgcolor: 'white',
+          borderRadius: 2,
+          boxShadow: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          marginTop: '40px'  // Adjusted for spacing under fixed header
+        }}
+      >
+        <Stack spacing={2} sx={{ p: 2, overflowY: 'auto', flex: 1 }}>
+          {messages.map((message, index) => (
+            <Box
+              key={index}
+              display="flex"
+              alignItems="center"
+              sx={{
+                justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
+              }}
+            >
+              <Avatar sx={{
+                bgcolor: message.role === 'user' ? '#007bff' : '#e0e0e0',
+                color: message.role === 'user' ? 'white' : 'black',
+                mr: message.role === 'user' ? 1 : 0,
+                ml: message.role === 'user' ? 0 : 1,
+              }}>
+                {message.role === 'user' ? <PersonIcon /> : <SupportAgentIcon />}
+              </Avatar>
+              <Box
+                sx={{
+                  p: 1.5,
+                  borderRadius: 1,
+                  bgcolor: message.role === 'user' ? '#007bff' : '#e0e0e0',
+                  color: message.role === 'user' ? 'white' : 'black',
+                }}
+              >
+                {message.content}
+              </Box>
+            </Box>
+          ))}
+          <div ref={messagesEndRef} />
+        </Stack>
+        <Stack direction="row" spacing={2} sx={{ p: 2 }}>
+          <TextField
+            label="Message"
+            fullWidth
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            disabled={isLoading}
+          />
+          <Button 
+            variant="contained"
+            onClick={sendMessage}
+            disabled={isLoading}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+            {isLoading ? 'Sending...' : 'Send'}
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
