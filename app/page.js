@@ -1,11 +1,10 @@
-
-
 'use client'
 
 import { Box, Button, Stack, TextField, Typography, Avatar } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import ReactMarkdown from 'react-markdown';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -19,14 +18,14 @@ export default function Home() {
 
   const sendMessage = async () => {
     if (!message.trim()) return;  // Don't send empty messages
-  
+
     setMessage('');
     setMessages((messages) => [
       ...messages,
       { role: 'user', content: message },
       { role: 'assistant', content: '' },
     ]);
-  
+
     try {
       setIsLoading(true);
       const response = await fetch('/api/chat', {
@@ -36,14 +35,14 @@ export default function Home() {
         },
         body: JSON.stringify({ message }), // Send only the message in the body
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok: ' + response.statusText);
       }
-  
+
       const responseData = await response.json();
       const assistantMessage = responseData.message; // Extract the message content
-  
+
       setMessages((messages) => {
         const lastMessage = messages[messages.length - 1];
         const otherMessages = messages.slice(0, messages.length - 1);
@@ -62,7 +61,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-  
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -142,7 +140,9 @@ export default function Home() {
                   color: message.role === 'user' ? 'white' : 'black',
                 }}
               >
-                {message.content}
+                <ReactMarkdown className='ReactMarkdown'>
+                  {message.content}
+                </ReactMarkdown>
               </Box>
             </Box>
           ))}
@@ -169,28 +169,3 @@ export default function Home() {
     </Box>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -105,3 +105,11 @@ a {
     color-scheme: dark;
   }
 }
+.ReactMarkdown ul {
+  list-style-type: none; /* Removes bullets */
+  padding-left: 0; /* Removes padding */
+}
+
+.ReactMarkdown li {
+  margin-bottom: 0.5em; /* Optional: Adjusts spacing between list items */
+}
