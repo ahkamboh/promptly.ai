@@ -1,8 +1,12 @@
-import {  NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// app/api/generate/route.js
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+import { NextResponse } from 'next/server';
+import Groq from 'groq-sdk';
 
+// Initialize GROQ with your API key
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Define the system prompt
 const systemPrompt = `
 You are the customer support bot for HeadstarterAI, an AI-powered platform for software engineering (SWE) interview preparation. Your role is to assist users with the following:
 
@@ -13,22 +17,32 @@ You are the customer support bot for HeadstarterAI, an AI-powered platform for s
 5. Recognize when to escalate complex issues to a human agent.
 6. Maintain clear, polite, and empathetic communication.
 7. Ensure users have a smooth experience, helping them prepare effectively for SWE interviews.
-8. Ensure your response in plain text not in md language , just only and only in plain text.
+8. Ensure your response in plain text not in md language, just only and only in plain text.
 `;
 
 export async function POST(req) {
   try {
-    const { message } = await req.json(); // Extract message from the request body
+    // Extract message from the request body
+    const { message } = await req.json();
 
-    const prompt = systemPrompt + message; // Concatenate system prompt and user message
+    // Concatenate system prompt and user message
+    const prompt = systemPrompt + message;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-    const result = await model.generateContent(prompt);
+    // Generate content using GROQ's chat completions
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ],
+      model: 'llama3-8b-8192', // Ensure this model ID is correct for GROQ
+    });
 
-    const response = result.response;
-    const text = await response.text(); // Extract the generated text from the response
+    // Extract and return the generated text
+    const response = chatCompletion.choices[0]?.message?.content || "No content returned";
 
-    return NextResponse.json({ message: text });
+    return NextResponse.json({ message: response });
   } catch (error) {
     console.error('Error generating content:', error);
     return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });

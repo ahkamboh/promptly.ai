@@ -1,12 +1,20 @@
 'use client'
 
-import { Box, Button, Stack, TextField, Typography, Avatar } from '@mui/material';
+import { Box, Button, Stack, TextField, Typography, Avatar, CircularProgress } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import PersonIcon from '@mui/icons-material/Person';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import SupportAgentIcon from '@mui/icons-material/SupportAgent'; // Import the icon
 import ReactMarkdown from 'react-markdown';
+import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
+
 
 export default function Home() {
+  const { user } = useUser();
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -23,7 +31,7 @@ export default function Home() {
     setMessages((messages) => [
       ...messages,
       { role: 'user', content: message },
-      { role: 'assistant', content: '' },
+      { role: 'assistant', content: '' }, // Placeholder for the loading animation
     ]);
 
     try {
@@ -80,92 +88,82 @@ export default function Home() {
   }, [messages]);
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      minHeight="100vh"
-      sx={{ backgroundColor: '#f0f0f0', position: 'relative', paddingTop: '100px' }}
-    >
-      <Typography 
-        variant="h4" 
-        sx={{ 
-          position: 'absolute', 
-          top: 0, 
-          width: '100%', 
-          textAlign: 'center', 
-          padding: '20px 0', 
-          backgroundColor: '#fff', 
-          boxShadow: '0px 2px 4px rgba(0,0,0,0.1)' 
-        }}
-      >
-        HeadStarter User Support Chatbot
-      </Typography>
-      <Box
-        sx={{
-          width: '500px',
-          maxHeight: '80vh',
-          bgcolor: 'white',
-          borderRadius: 2,
-          boxShadow: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          marginTop: '40px'  // Adjusted for spacing under fixed header
-        }}
-      >
-        <Stack spacing={2} sx={{ p: 2, overflowY: 'auto', flex: 1 }}>
-          {messages.map((message, index) => (
-            <Box
-              key={index}
-              display="flex"
-              alignItems="center"
-              sx={{
-                justifyContent: message.role === 'user' ? 'flex-end' : 'flex-start',
-              }}
-            >
-              <Avatar sx={{
-                bgcolor: message.role === 'user' ? '#007bff' : '#e0e0e0',
-                color: message.role === 'user' ? 'white' : 'black',
-                mr: message.role === 'user' ? 1 : 0,
-                ml: message.role === 'user' ? 0 : 1,
-              }}>
-                {message.role === 'user' ? <PersonIcon /> : <SupportAgentIcon />}
-              </Avatar>
-              <Box
-                sx={{
-                  p: 1.5,
-                  borderRadius: 1,
-                  bgcolor: message.role === 'user' ? '#007bff' : '#e0e0e0',
-                  color: message.role === 'user' ? 'white' : 'black',
-                }}
+    <>
+      {/* <UserButton />
+      <SignedIn>
+        <h1 className='text-black  font-bold text-3xl'>Sign in</h1>
+      </SignedIn>
+
+      <SignedOut>
+        <SignInButton mode="redirect">
+          <h1 className='text-black font-bold text-3xl'>Signout</h1>
+        </SignInButton>
+      </SignedOut> */}
+
+      {/* <div id="user-name">Hello, {user.firstName} {user.lastName}!</div> */}
+
+      {/* <div className="flex flex-col items-center min-h-screen bg-gray-200 pt-24">
+  
+        <div className="w-full max-w-md h-[80vh] bg-white rounded-lg shadow-lg flex flex-col overflow-hidden mt-10">
+          <div className="flex-1 p-4 overflow-y-auto">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex items-center mb-2 ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                }`}
               >
-                <ReactMarkdown className='ReactMarkdown'>
-                  {message.content}
-                </ReactMarkdown>
-              </Box>
-            </Box>
-          ))}
-          <div ref={messagesEndRef} />
-        </Stack>
-        <Stack direction="row" spacing={2} sx={{ p: 2 }}>
-          <TextField
-            label="Message"
-            fullWidth
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
-          <Button 
-            variant="contained"
-            onClick={sendMessage}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Sending...' : 'Send'}
-          </Button>
-        </Stack>
-      </Box>
-    </Box>
+                <div
+                  className={`flex items-center justify-center rounded-full p-2 ${
+                    message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'
+                  }`}
+                >
+                  {message.role === 'user' ? (
+                    <PersonIcon />
+                  ) : (
+                    <SupportAgentIcon />
+                  )}
+                </div>
+                <div
+                  className={`ml-2 p-3 rounded-lg max-w-xs ${
+                    message.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'
+                  }`}
+                >
+                  {message.content ? (
+                    <ReactMarkdown className='ReactMarkdown'>
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <CircularProgress size={24} />
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="p-4 flex space-x-2">
+            <input
+              type="text"
+              placeholder="Message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={isLoading}
+              className="flex-grow p-2 border border-gray-300 rounded"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={isLoading}
+              className={`px-4 py-2 rounded bg-blue-500 text-white ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isLoading ? 'Sending...' : 'Send'}
+            </button>
+          </div>
+        </div>
+      </div> */}
+
+    </>
   );
 }
