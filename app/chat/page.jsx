@@ -165,7 +165,7 @@ export default function Page() {
                 </h1>
               </div>
             )}
-            <div className="flex justify-center mt-16  ">
+            <div className="flex justify-center mt-16  pl-5 ">
               <div className="flex  gap-2  scroll-hidden overflow-x-auto">
                 <Card
                   icon={<FaUserTie className="text-2xl" />}
