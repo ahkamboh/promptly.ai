@@ -1,9 +1,6 @@
-// app/api/generate/route.js
 import { NextResponse } from 'next/server';
 import Groq from 'groq-sdk';
-
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
 const systemPrompt = `
 👋 Hi there! Welcome to Promptly! 😊 I'm your AI bot assistant, here to help you with any questions or issues you might have.
 
@@ -32,9 +29,6 @@ export async function POST(req) {
   try {
     const { message } = await req.json();
     const prompt = `${systemPrompt}\n\nUser Message:\n${message}`;
-
-    console.log('Prompt being sent:', prompt); // Debugging: Log the complete prompt
-
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
@@ -46,9 +40,6 @@ export async function POST(req) {
     });
 
     const response = chatCompletion.choices[0]?.message?.content || "No content returned";
-
-    console.log('Response received:', response); // Debugging: Log the response
-
     return NextResponse.json({ message: response });
   } catch (error) {
     console.error('Error generating content:', error);

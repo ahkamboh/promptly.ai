@@ -284,8 +284,8 @@ pre{
 }
 
 @media (max-width: 640px) {
-  pre{
-    max-width: 270px;
+  pre,code{
+    max-width: 240px;
   }
 
   ::-webkit-scrollbar {

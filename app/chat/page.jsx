@@ -17,11 +17,18 @@ import Box from "@mui/material/Box";
 import Rating from "@mui/material/Rating";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+
+// Firebase imports
+import { db } from "../lib/firebase";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 
 function Card({ icon, text, onClick }) {
   return (
     <div
-      className="flex-1 poppins-regular min-w-[180px]   h-48 rounded-xl cursor-pointer bg-[#1e1f20] text-white p-4 shadow-md hover:bg-[#333] transition duration-200 flex flex-col justify-between"
+      className="flex-1 poppins-regular min-w-[180px] h-48 rounded-xl cursor-pointer bg-[#1e1f20] text-white p-4 shadow-md hover:bg-[#333] transition duration-200 flex flex-col justify-between"
       onClick={onClick}
     >
       <div>{text}</div>
@@ -31,6 +38,17 @@ function Card({ icon, text, onClick }) {
     </div>
   );
 }
+
+const CodeBlock = ({ language, value }) => {
+  return (
+    <SyntaxHighlighter
+      language={language}
+      style={solarizedlight}
+    >
+      {value}
+    </SyntaxHighlighter>
+  );
+};
 
 export default function Page() {
   const { user } = useUser();
@@ -79,9 +97,7 @@ export default function Page() {
       });
 
       if (!response.ok) {
-        throw new Error(
-          "Network response was not ok: " + response.statusText
-        );
+        throw new Error("Network response was not ok: " + response.statusText);
       }
 
       const responseData = await response.json();
@@ -91,6 +107,16 @@ export default function Page() {
       };
 
       setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+
+      // Store the conversation in Firebase
+      if (user) {
+        await addDoc(collection(db, "conversations"), {
+          userId: user.id,
+          userMessage: newUserMessage,
+          aiResponse: assistantMessage,
+          timestamp: new Date(),
+        });
+      }
 
       if (!reviewSubmitted) {
         setShowReviewModal(true);
@@ -136,10 +162,20 @@ export default function Page() {
     scrollToBottom();
   }, [messages]);
 
-  const handleReviewSubmit = () => {
-    // Handle review submission logic (e.g., save to database)
-    console.log("Rating:", rating);
-    console.log("Review Text:", reviewText);
+  const handleReviewSubmit = async () => {
+    if (user) {
+      try {
+        await addDoc(collection(db, "reviews"), {
+          userId: user.id,
+          rating: rating,
+          reviewText: reviewText,
+          timestamp: new Date(),
+        });
+        console.log("Review submitted successfully");
+      } catch (error) {
+        console.error("Error submitting review:", error);
+      }
+    }
 
     setShowReviewModal(false);
     setReviewSubmitted(true);
@@ -149,6 +185,37 @@ export default function Page() {
     setShowReviewModal(false);
   };
 
+  const fetchConversationHistory = async () => {
+    if (user) {
+      try {
+        const q = query(
+          collection(db, "conversations"),
+          where("userId", "==", user.id)
+        );
+        const querySnapshot = await getDocs(q);
+        const history = [];
+        querySnapshot.forEach((doc) => {
+          history.push(doc.data());
+        });
+        // Sort history by timestamp
+        history.sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate());
+
+        // Update the messages state with the fetched history
+        setMessages(
+          history.flatMap((item) => [item.userMessage, item.aiResponse])
+        );
+      } catch (error) {
+        console.error("Error fetching conversation history:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchConversationHistory();
+    }
+  }, [user]);
+
   return (
     <div className="relative ">
       <div className=" p-5">
@@ -157,21 +224,22 @@ export default function Page() {
       <div className="overflow-y-auto h-[calc(100vh-152px)] w-full relative  sm:px-12 sm:pr-10 sm:pb-0 pb-12  ">
         <div className="max-w-3xl mx-auto  ">
           <div>
-            {user && (
-              <div className="sm:p-0 p-8">
-                <h1 id="user-name">Hello, {user.firstName}!</h1>
+         
+                <div className="sm:p-0 p-8">
+                <h1 id="user-name">Hello{user && (<span>, {user.firstName}!</span>)}</h1>
                 <h1 className="text-[#444746] Mixcase-500 text-4xl">
                   How can I help you today?
                 </h1>
               </div>
-            )}
-            <div className="flex justify-center mt-16  smp-0 :pl-5 ">
+            <div className="flex justify-center mt-16  sm:p-0 pl-5 ">
               <div className="flex  gap-2  scroll-hidden overflow-x-auto">
                 <Card
                   icon={<FaUserTie className="text-2xl" />}
                   text="Walk me through how to apply for a new role"
                   onClick={() =>
-                    handleCardClick("Walk me through how to apply for a new role")
+                    handleCardClick(
+                      "Walk me through how to apply for a new role"
+                    )
                   }
                 />
                 <Card
@@ -184,15 +252,15 @@ export default function Page() {
                 <Card
                   icon={<FaRedo className="text-2xl" />}
                   text="How do I reset my password?"
-                  onClick={() =>
-                    handleCardClick("How do I reset my password?")
-                  }
+                  onClick={() => handleCardClick("How do I reset my password?")}
                 />
                 <Card
                   icon={<FaBook className="text-2xl" />}
                   text="Can you recommend some learning resources?"
                   onClick={() =>
-                    handleCardClick("Can you recommend some learning resources?")
+                    handleCardClick(
+                      "Can you recommend some learning resources?"
+                    )
                   }
                 />
               </div>
@@ -202,52 +270,88 @@ export default function Page() {
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`flex mb-2 w-full ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}
+                className={`flex mb-2 w-full ${msg.role === "user" ? "justify-end" : "justify-start"
+                  }`}
               >
-                <div className="flex items-start pb-7">
-                  <div className=" rounded-full  overflow-hidden object-cover  text-white mt-1">
+                <div className="sm:flex grid  items-start pb-7">
+                  <div className=" rounded-full w-fit  overflow-hidden object-cover  text-white mt-1">
                     {msg.role === "user" ? (
                       <img
                         src={user?.imageUrl}
                         alt="User Profile"
                         onError={(e) =>
-                          (e.target.src =
-                            "https://chatbot.design/images/chatbot/DIGITAL%20%28RGB%29/PNG/Contained_Mark_Blue.png")
+                        (e.target.src =
+                          "https://chatbot.design/images/chatbot/DIGITAL%20%28RGB%29/PNG/Contained_Mark_Blue.png")
                         }
-                        className=" h-10 w-10"
+                        className="h-10 w-10"
                       />
                     ) : (
-                      <div className="w-10 h-10 rounded-full overflow-hidden ">
+                      <div className=" rounded-full   object-cover overflow-hidden">
                         <img
                           src="https://chatbot.design/images/chatbot/DIGITAL%20%28RGB%29/PNG/Contained_Mark_Blue.png"
-                          alt=""
+                          alt="Bot Logo"
+                          className=" w-10 h-10  "
                         />
                       </div>
                     )}
                   </div>
-                  <div className=" p-3 w-full rounded-lg  text-white">
+                  <div
+                    className={`ml-2 p-2 pb-1 max-w-md  text-sm ${msg.role === "user"
+                        ? "bg-blue-500 text-white"
+                        : "text-white"
+                      } rounded-3xl`}
+                  >
                     {msg.content ? (
-                  <ReactMarkdown 
-                  className="w-full prose prose-invert prose-sm max-w-none"
-                  components={{
-                    h1: ({node, ...props}) => <h1 className="text-2xl font-bold mb-2" {...props} />,
-                    h2: ({node, ...props}) => <h2 className="text-xl font-bold mb-2" {...props} />,
-                    h3: ({node, ...props}) => <h3 className="text-lg font-bold mb-1" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc pl-4 mb-2" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal pl-4 mb-2" {...props} />,
-                    li: ({node, ...props}) => <li className="mb-1" {...props} />,
-                    p: ({node, ...props}) => <p className="mb-2" {...props} />,
-                    a: ({node, ...props}) => <a className="text-blue-300 hover:underline" {...props} />,
-                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gray-500 pl-2 italic" {...props} />,
-                    code: ({node, ...props}) => <code className="bg-gray-800 rounded px-1" {...props} />,
-                    pre: ({node, ...props}) => <pre className="bg-gray-800 rounded p-2 mb-2 overflow-x-auto" {...props} />,
-                  }}
-                >
-                  {msg.content}
-                </ReactMarkdown>
-                    ) :   <CircularProgress size={24} />}
+<ReactMarkdown
+      className="w-full prose prose-invert prose-sm max-w-none"
+      components={{
+        h1: ({ node, ...props }) => (
+          <h1 className="text-2xl font-bold mb-2" {...props} />
+        ),
+        h2: ({ node, ...props }) => (
+          <h2 className="text-xl font-bold mb-2" {...props} />
+        ),
+        h3: ({ node, ...props }) => (
+          <h3 className="text-lg font-bold mb-1" {...props} />
+        ),
+        ul: ({ node, ...props }) => (
+          <ul className="list-disc pl-4 mb-2" {...props} />
+        ),
+        ol: ({ node, ...props }) => (
+          <ol className="list-decimal pl-4 mb-2" {...props} />
+        ),
+        li: ({ node, ...props }) => (
+          <li className="mb-1" {...props} />
+        ),
+        p: ({ node, ...props }) => (
+          <p className="mb-2" {...props} />
+        ),
+        a: ({ node, ...props }) => (
+          <a className="text-blue-300 hover:underline" {...props} />
+        ),
+        blockquote: ({ node, ...props }) => (
+          <blockquote className="border-l-4 border-gray-500 pl-2 italic" {...props} />
+        ),
+        code: ({ node, inline, className, children, ...props }) => {
+          const language = className ? className.replace('language-', '') : '';
+          return inline ? (
+            <code className="rounded overflow-x-auto" {...props}>
+              {children}
+            </code>
+          ) : (
+            <CodeBlock language={language} value={String(children).replace(/\n$/, '')} />
+          );
+        },
+        pre: ({ node, ...props }) => (
+          <pre className=" rounded overflow-x-auto" {...props} />
+        ),
+      }}
+    >
+      {msg.content}
+    </ReactMarkdown>
+                    ) : (
+                      <CircularProgress size={24} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -257,30 +361,30 @@ export default function Page() {
         </div>
       </div>
       <div
-          className={`bg-[#1e1f20] poppins-regular text-white max-w-3xl min-h-16 fixed bottom-5 left-1/2 transform scroll-sp -translate-x-1/2 z-50 w-[90%] p-4 shadow-lg flex ${addClass ? 'rounded-xl' : 'rounded-full'} ${addClass ? 'items-end' : 'items-center'}`}
-        >
-          <textarea
-            ref={textareaRef}
-            placeholder="Enter a prompt here..."
-            className="textarea-field bg-[#1e1f20] flex-grow p-2 border-none focus:outline-none resize-none overflow-y-auto"
-            value={message}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-            rows="1"
-            style={{ maxHeight: '200px', minHeight: '14px' }}
-          />
-          <FaArrowRight
-            className="ml-4 text-xl text-white cursor-pointer"
-            onClick={sendMessage}
-          />
-        </div>
+        className={`bg-[#1e1f20] poppins-regular text-white max-w-3xl min-h-16 fixed bottom-5 left-1/2 transform scroll-sp -translate-x-1/2 z-50 w-[90%] p-4 shadow-lg flex ${addClass ? "rounded-xl" : "rounded-full"
+          } ${addClass ? "items-end" : "items-center"}`}
+      >
+        <textarea
+          ref={textareaRef}
+          placeholder="Enter a prompt here..."
+          className="textarea-field bg-[#1e1f20] flex-grow p-2 border-none focus:outline-none resize-none overflow-y-auto"
+          value={message}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          rows="1"
+          style={{ maxHeight: "200px", minHeight: "14px" }}
+        />
+        <FaArrowRight
+          className="ml-4 text-xl text-white cursor-pointer"
+          onClick={sendMessage}
+        />
+      </div>
 
       <Modal
         open={showReviewModal}
         onClose={handleReviewClose}
         aria-labelledby="review-modal-title"
         aria-describedby="review-modal-description"
-       
       >
         <Box
           sx={{
@@ -295,7 +399,9 @@ export default function Page() {
             borderRadius: 2,
           }}
         >
-          <h2 id="review-modal-title" className="poppins-regular "> Rate Your Experience</h2>
+          <h2 id="review-modal-title" className="poppins-regular ">
+            Rate Your Experience
+          </h2>
           <Rating
             name="user-rating"
             value={rating}
