@@ -7,7 +7,6 @@ import {
   FaRedo,
   FaBook,
   FaArrowRight,
-  FaRobot,
 } from "react-icons/fa";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
@@ -19,7 +18,6 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
-
 
 // Firebase imports
 import { db } from "../lib/firebase";
