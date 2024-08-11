@@ -282,6 +282,18 @@ pre{
  width: 0px;
  height: 0px;
 }
+
+@media (max-width: 640px) {
+  pre{
+    max-width: 270px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0px;
+  }
+  
+}
+
 .bg-glass{
 background: rgba(255, 255, 255, 0.2);
 box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
