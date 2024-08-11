@@ -154,7 +154,7 @@ export default function Page() {
       <div className=" p-5">
         <UserButton />
       </div>
-      <div className="overflow-y-auto h-[calc(100vh-100px)] w-full relative ">
+      <div className="overflow-y-auto h-[calc(100vh-152px)] w-full relative  sm:px-12 sm:pr-10 ">
         <div className="max-w-3xl mx-auto  ">
           <div>
             {user && (
@@ -165,7 +165,7 @@ export default function Page() {
                 </h1>
               </div>
             )}
-            <div className="flex justify-center mt-16  pl-5 ">
+            <div className="flex justify-center mt-16  smp-0 :pl-5 ">
               <div className="flex  gap-2  scroll-hidden overflow-x-auto">
                 <Card
                   icon={<FaUserTie className="text-2xl" />}
@@ -227,7 +227,7 @@ export default function Page() {
                       </div>
                     )}
                   </div>
-                  <div className="pb-9 p-3 w-full rounded-lg  text-white">
+                  <div className=" p-3 w-full rounded-lg  text-white">
                     {msg.content ? (
                   <ReactMarkdown 
                   className="w-full prose prose-invert prose-sm max-w-none"
