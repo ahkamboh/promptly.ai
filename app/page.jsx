@@ -5,7 +5,7 @@ function Page() {
   return (
     <div className="relative poppins-regular container h-screen mx-auto ">
       <div className=" p-10 absolute z-20 top-[50%] w-full text-center  left-[50%] -translate-x-1/2 -translate-y-1/2 ">
-        <div className="pb-2 Mixcase-800  pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#4285f4] bg-clip-text text-center text-7xl font-bold leading-none tracking-tighter text-transparent w-full ">
+        <div className="pb-2 Mixcase-800  pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#4285f4] bg-clip-text text-center sm:text-7xl text-5xl font-bold leading-none tracking-tighter text-transparent w-full ">
           Promptly.ai
         </div>
         <p className="text-base text-white">
@@ -13,10 +13,14 @@ function Page() {
           Generation{" "}
         </p>
       </div>
-      <div className=" absolute  h-full w-full  ">
+      <div className=" absolute top-[50%] w-full left-[50%] -translate-x-1/2 -translate-y-1/2    h-full">
         <Spline scene="https://prod.spline.design/4jQTDA1PS4DCq913/scene.splinecode" />
       </div>
-
+      {/* <div className=" absolute top-[50%] w-full left-[50%] -translate-x-1/2 -translate-y-1/2  after-sm ">
+      <Spline
+        scene="https://prod.spline.design/xQ04rhg7-eWMflKB/scene.splinecode" 
+      />
+      </div> */}
       <nav className="max-w-4xl mx-auto relative top-8  bg-glass rounded-full  flex justify-between items-center p-2 ">
         <div className="w-10 h-10 rounded-full overflow-hidden ">
           <img
