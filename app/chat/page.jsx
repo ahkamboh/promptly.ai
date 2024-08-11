@@ -154,7 +154,7 @@ export default function Page() {
       <div className=" p-5">
         <UserButton />
       </div>
-      <div className="overflow-y-auto h-[calc(100vh-152px)] w-full relative  sm:px-12 sm:pr-10 ">
+      <div className="overflow-y-auto h-[calc(100vh-152px)] w-full relative  sm:px-12 sm:pr-10 sm:pb-0 pb-12  ">
         <div className="max-w-3xl mx-auto  ">
           <div>
             {user && (
