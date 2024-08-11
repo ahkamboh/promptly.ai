@@ -16,11 +16,6 @@ function Page() {
       <div className=" absolute top-[50%] w-full left-[50%] -translate-x-1/2 -translate-y-1/2    h-full">
         <Spline scene="https://prod.spline.design/4jQTDA1PS4DCq913/scene.splinecode" />
       </div>
-      {/* <div className=" absolute top-[50%] w-full left-[50%] -translate-x-1/2 -translate-y-1/2  after-sm ">
-      <Spline
-        scene="https://prod.spline.design/xQ04rhg7-eWMflKB/scene.splinecode" 
-      />
-      </div> */}
       <nav className="max-w-4xl mx-auto relative top-8  bg-glass rounded-full  flex justify-between items-center p-2 ">
         <div className="w-10 h-10 rounded-full overflow-hidden ">
           <img

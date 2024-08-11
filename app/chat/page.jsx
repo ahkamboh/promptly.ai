@@ -21,7 +21,7 @@ import Button from "@mui/material/Button";
 function Card({ icon, text, onClick }) {
   return (
     <div
-      className="flex-1 poppins-regular min-w-[calc(25%-1.5rem)] h-48 rounded-xl cursor-pointer bg-[#1e1f20] text-white p-4 shadow-md hover:bg-[#333] transition duration-200 flex flex-col justify-between"
+      className="flex-1 poppins-regular min-w-[180px]   h-48 rounded-xl cursor-pointer bg-[#1e1f20] text-white p-4 shadow-md hover:bg-[#333] transition duration-200 flex flex-col justify-between"
       onClick={onClick}
     >
       <div>{text}</div>
@@ -166,7 +166,7 @@ export default function Page() {
               </div>
             )}
             <div className="flex justify-center mt-16  ">
-              <div className="flex  gap-2  overflow-x-auto">
+              <div className="flex  gap-2  scroll-hidden overflow-x-auto">
                 <Card
                   icon={<FaUserTie className="text-2xl" />}
                   text="Walk me through how to apply for a new role"
