@@ -154,7 +154,7 @@ export default function Page() {
       <div className=" p-5">
         <UserButton />
       </div>
-      <div className="overflow-y-auto pb-6 h-[calc(100vh-9.5rem)] w-full relative ">
+      <div className="overflow-y-auto h-[calc(100vh-100px)] w-full relative ">
         <div className="max-w-3xl mx-auto  ">
           <div>
             {user && (
@@ -206,7 +206,7 @@ export default function Page() {
                   msg.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                <div className="flex items-start ">
+                <div className="flex items-start pb-7">
                   <div className=" rounded-full  overflow-hidden object-cover  text-white mt-1">
                     {msg.role === "user" ? (
                       <img
@@ -227,7 +227,7 @@ export default function Page() {
                       </div>
                     )}
                   </div>
-                  <div className="ml-2 p-3 w-full rounded-lg  text-white">
+                  <div className="pb-9 p-3 w-full rounded-lg  text-white">
                     {msg.content ? (
                   <ReactMarkdown 
                   className="w-full prose prose-invert prose-sm max-w-none"
