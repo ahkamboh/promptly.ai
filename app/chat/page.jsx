@@ -497,7 +497,7 @@ export default function Page() {
           );
         },
         pre: ({ node, ...props }) => (
-          <pre className=" rounded overflow-x-auto" {...props} />
+          <pre className=" rounded overflow-x-auto " {...props} />
         ),
       }}
     >
@@ -539,6 +539,7 @@ export default function Page() {
   onClose={handleReviewClose}
   aria-labelledby="review-modal-title"
   aria-describedby="review-modal-description"
+  className="mx-7"
 >
   <Box
     sx={{
