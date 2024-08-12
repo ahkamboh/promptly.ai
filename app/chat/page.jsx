@@ -60,7 +60,161 @@ export default function Page() {
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const textareaRef = useRef(null);
+  const messagesEndRef = useRef(null); 
+  const [promptCount, setPromptCount] = useState(0); // New state for counting prompts
 
+  // useEffect(() => {
+  //   const textarea = textareaRef.current;
+
+  //   if (textarea) {
+  //     textarea.style.height = "auto";
+  //     textarea.style.height = `${textarea.scrollHeight}px`;
+
+  //     const shouldAddClass =
+  //       textarea.scrollHeight > 50 || textarea.value.includes("\n");
+
+  //     if (shouldAddClass !== addClass) {
+  //       setAddClass(shouldAddClass);
+  //     }
+  //   }
+  // }, [message, addClass]);
+
+  // const sendMessage = async () => {
+  //   if (!message.trim()) return;
+
+  //   const newUserMessage = { role: "user", content: message };
+  //   setMessages((prevMessages) => [...prevMessages, newUserMessage]);
+  //   setMessage("");
+
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await fetch("/api/chat", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ message }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok: " + response.statusText);
+  //     }
+
+  //     const responseData = await response.json();
+  //     const assistantMessage = {
+  //       role: "assistant",
+  //       content: responseData.message,
+  //     };
+
+  //     setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+
+  //     // Store the conversation in Firebase
+  //     if (user) {
+  //       await addDoc(collection(db, "conversations"), {
+  //         userId: user.id,
+  //         userMessage: newUserMessage,
+  //         aiResponse: assistantMessage,
+  //         timestamp: new Date(),
+  //       });
+  //     }
+
+  //     if (!reviewSubmitted) {
+  //       setShowReviewModal(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error in sendMessage:", error);
+  //     setMessages((prevMessages) => [
+  //       ...prevMessages,
+  //       {
+  //         role: "assistant",
+  //         content:
+  //           "I'm sorry, but I encountered an error. Please try again later.",
+  //       },
+  //     ]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const handleInputChange = (event) => {
+  //   setMessage(event.target.value);
+  // };
+
+  // const handleKeyPress = (event) => {
+  //   if (event.key === "Enter" && !event.shiftKey) {
+  //     event.preventDefault();
+  //     sendMessage();
+  //   }
+  // };
+
+  // const handleCardClick = (text) => {
+  //   setMessage(text);
+  //   sendMessage();
+  // };
+
+  // const messagesEndRef = useRef(null);
+
+  // const scrollToBottom = () => {
+  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // };
+
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [messages]);
+
+  // const handleReviewSubmit = async () => {
+  //   if (user) {
+  //     try {
+  //       await addDoc(collection(db, "reviews"), {
+  //         userId: user.id,
+  //         rating: rating,
+  //         reviewText: reviewText,
+  //         timestamp: new Date(),
+  //       });
+  //       console.log("Review submitted successfully");
+  //     } catch (error) {
+  //       console.error("Error submitting review:", error);
+  //     }
+  //   }
+
+  //   setShowReviewModal(false);
+  //   setReviewSubmitted(true);
+  // };
+
+  // const handleReviewClose = () => {
+  //   setShowReviewModal(false);
+  // };
+
+  // const fetchConversationHistory = async () => {
+  //   if (user) {
+  //     try {
+  //       const q = query(
+  //         collection(db, "conversations"),
+  //         where("userId", "==", user.id)
+  //       );
+  //       const querySnapshot = await getDocs(q);
+  //       const history = [];
+  //       querySnapshot.forEach((doc) => {
+  //         history.push(doc.data());
+  //       });
+  //       // Sort history by timestamp
+  //       history.sort((a, b) => a.timestamp.toDate() - b.timestamp.toDate());
+
+  //       // Update the messages state with the fetched history
+  //       setMessages(
+  //         history.flatMap((item) => [item.userMessage, item.aiResponse])
+  //       );
+  //     } catch (error) {
+  //       console.error("Error fetching conversation history:", error);
+  //     }
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (user) {
+  //     fetchConversationHistory();
+  //   }
+  // }, [user]);
   useEffect(() => {
     const textarea = textareaRef.current;
 
@@ -116,7 +270,11 @@ export default function Page() {
         });
       }
 
-      if (!reviewSubmitted) {
+      // Increase the prompt count
+      setPromptCount((prevCount) => prevCount + 1);
+
+      // Show the review modal after two prompts
+      if (promptCount === 1 && !reviewSubmitted) {
         setShowReviewModal(true);
       }
     } catch (error) {
@@ -149,8 +307,6 @@ export default function Page() {
     setMessage(text);
     sendMessage();
   };
-
-  const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -379,55 +535,100 @@ export default function Page() {
       </div>
 
       <Modal
-        open={showReviewModal}
-        onClose={handleReviewClose}
-        aria-labelledby="review-modal-title"
-        aria-describedby="review-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "#fff",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-          }}
-        >
-          <h2 id="review-modal-title" className="poppins-regular ">
-            Rate Your Experience
-          </h2>
-          <Rating
-            name="user-rating"
-            value={rating}
-            onChange={(event, newValue) => {
-              setRating(newValue);
-            }}
-          />
-          <TextField
-            id="review-modal-description"
-            label="Write your review"
-            multiline
-            rows={4}
-            variant="outlined"
-            fullWidth
-            value={reviewText}
-            onChange={(event) => setReviewText(event.target.value)}
-            sx={{ mt: 2 }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleReviewSubmit}
-            sx={{ mt: 2 }}
-          >
-            Submit Review
-          </Button>
-        </Box>
-      </Modal>
+  open={showReviewModal}
+  onClose={handleReviewClose}
+  aria-labelledby="review-modal-title"
+  aria-describedby="review-modal-description"
+>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: 400,
+      bgcolor: "#1e1f20",
+      boxShadow: 24,
+      color: "#fff",
+      p: 4,
+      borderRadius: 2,
+    }}
+  >
+    <h2 id="review-modal-title" className="poppins-regular">
+      Rate Your Experience
+    </h2>
+    <Rating
+      name="user-rating"
+      value={rating}
+      onChange={(event, newValue) => {
+        setRating(newValue);
+      }}
+      sx={{
+        background: 'linear-gradient(to bottom, #ffd319, #ff2975, #4285f4)', // Gradient for filled stars
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        '& .MuiRating-iconEmpty': {
+          color: 'rgba(255, 255, 255, 0.5)', // Color for unfilled stars
+        },
+        '& .MuiRating-iconFilled': {
+          background: 'linear-gradient(to bottom, #ffd319, #ff2975, #4285f4)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        },
+      }}
+    />
+    <TextField
+      id="review-modal-description"
+      label="Write your review"
+      multiline
+      rows={4}
+      variant="outlined"
+      fullWidth
+      className="review-area"
+      value={reviewText}
+      onChange={(event) => setReviewText(event.target.value)}
+      sx={{
+        mt: 2,
+        "& .MuiOutlinedInput-root": {
+          "& fieldset": {
+            borderColor: "rgba(255, 255, 255, 0.5)", // Border color
+          },
+          "&:hover fieldset": {
+            borderColor: "#fff", // Border color on hover
+          },
+          "&.Mui-focused fieldset": {
+            borderColor: "#fff", // Border color when focused
+          },
+        },
+        "& .MuiInputLabel-root": {
+          color: "#fff", // Label color changed to white
+        },
+        "& .MuiInputBase-input": {
+          color: "#fff", // Text color
+        },
+      }}
+    />
+    <Button
+      variant="contained"
+      onClick={handleReviewSubmit}
+      sx={{
+        mt: 2,
+        background: 'linear-gradient(to bottom, #ffd319, #ff2975, #4285f4)', // Gradient background
+        backgroundSize: '200%', // Ensures smooth transition when hovered
+        transition: 'background-position 0.5s ease', // Smooth transition effect
+        '&:hover': {
+          backgroundPosition: 'top right', // Change gradient direction on hover
+          backgroundImage: 'linear-gradient(to top right, #ffd319, #ff2975, #4285f4)', // Apply hover gradient
+        },
+        color: '#fff', // Text color
+      }}
+    >
+       Review
+    </Button>
+  </Box>
+</Modal>
+
+
     </div>
   );
 }
