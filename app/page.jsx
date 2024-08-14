@@ -1,5 +1,4 @@
 import Spline from "@splinetool/react-spline/next";
-// import Link from "next/link";
 import { SignInButton } from "@clerk/nextjs";
 function Page() {
   return (
