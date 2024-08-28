@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Promotly.ai
+
+Promotly.ai is an advanced AI platform designed to deliver faster, more efficient AI-powered interactions and services, comparable to ChatGPT but up to 20 times faster. This platform is ideal for businesses and developers looking to integrate rapid AI-driven solutions into their applications or services.
+
+## Overview
+
+Promotly.ai leverages cutting-edge technologies to provide high-speed AI responses, making it an ideal tool for customer service automation, real-time data analysis, and dynamic content generation. The platform supports robust scalability and integration capabilities, making it suitable for a wide range of use cases from small startups to large enterprises.
+
+## Key Features
+
+- **High-Speed AI Responses**: Delivers AI responses up to 20x faster than traditional models, enhancing user experience and engagement.
+
+## Users
+- **Clerk Authentication**: Secure user authentication with Clerk, managing over 34,000 users with 300 to 800 daily active users.
+
+## Upcoming Features
+
+We're excited to announce that we are focusing on the next version of Promotly.ai, set to release at the end of October. This update will include:
+
+- **Bot Training Section**: A new bot section where users can train their bots for websites or daily tasks.
+- **Developer Features**: Special features tailored for developers, allowing them to train and deploy bots on their platforms as assistants with just a simple npm command.
+- **And Much More**: Stay tuned for more exciting features in the upcoming release!
+
+## Tech Stack
+
+Promotly.ai is built using a modern tech stack to ensure high performance, scalability, and ease of integration:
+
+### Frontend
+
+- **Next.js**: A React framework for building server-side rendering and static web applications.
+- **TypeScript**: For static type checking and improved code quality.
+- **Tailwind CSS**: A utility-first CSS framework for fast UI development.
+
+### Backend
+
+- **Node.js**: A JavaScript runtime built on Chrome's V8 JavaScript engine.
+- **Firebase**: Used as the database for real-time data storage and synchronization.
+- **AWS**: Hosting platform providing scalable infrastructure for deploying Promotly.ai, including AI models.
+- **LLAMA 3.1**: Advanced AI model used for enhancing content generation and customer interaction.
+- **GROQ-SDK**: Provides high-performance AI models and API access, offering faster inference at a lower cost than competitors.
+
+### AI & Machine Learning
+
+- **LLAMA 3.1**: AI model fine-tuned specifically for Promotly.ai to generate intelligent responses and insights at high speed.
+- **GROQ-SDK**: Used to access the fine-tuned AI models on AWS, ensuring high-performance inference and low latency.
+
+### Authentication
+
+- **Clerk**: Secure and scalable user authentication service, managing a large user base effectively.
 
 ## Getting Started
 
-First, run the development server:
+To get a local copy up and running, follow these simple steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Node.js** (v14.x or later)
+- **npm** (v6.x or later) or **yarn** (v1.22.x or later)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Contributing
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+We welcome contributions to Promotly.ai! To contribute, please follow these steps:
 
-## Learn More
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature/YourFeature`).
+6. Open a pull request.
 
-To learn more about Next.js, take a look at the following resources:
+## License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Distributed under the MIT License. See `LICENSE` for more information.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Contact
 
-## Deploy on Vercel
+- **Reach out me**: [Linkedin Profile](https://www.linkedin.com/in/ahkamboh/)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
