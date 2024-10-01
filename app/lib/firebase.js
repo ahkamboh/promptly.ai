@@ -6,12 +6,12 @@ import { getAuth } from 'firebase/auth';
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: "promptly-4827b.firebaseapp.com",
-  projectId: "promptly-4827b",
-  storageBucket: "promptly-4827b.appspot.com",
-  messagingSenderId: "421112414909",
-  appId: "1:421112414909:web:d31979ba9114b8cbc16dd4",
-  measurementId: "G-8EX3KRE7YM"
+  authDomain: "artisanal-3a657.firebaseapp.com",
+  databaseURL: "https://artisanal-3a657-default-rtdb.firebaseio.com",
+  projectId: "artisanal-3a657",
+  storageBucket: "artisanal-3a657.appspot.com",
+  messagingSenderId: "828954438665",
+  appId: "1:828954438665:web:daf30641fcce8721ca1cd8"
 };
 
 // Initialize Firebase
