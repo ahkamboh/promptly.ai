@@ -1,7 +1,8 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
-
+import { neobrutalism } from "@clerk/themes";
+import 'clerk-themez/themes/cosmicflux.css';
 const inter = Inter({ subsets: ['latin'] });
 
 const imageUrl = 'https://chatbot.design/images/chatbot/DIGITAL%20%28RGB%29/PNG/Contained_Mark_Blue.png';  // Update this URL if necessary
@@ -36,7 +37,12 @@ export const metadata = {
 };
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+    appearance={{
+      baseTheme: neobrutalism,
+      variables: { colorPrimary: "#fa0053" },
+      }}
+    >
       <html lang="en">
         <body className={inter.className}>
           {children}
